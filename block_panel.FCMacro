@@ -1,0 +1,54 @@
+# -*- coding: utf-8 -*-
+
+import FreeCAD,FreeCADGui,Part,os,pathlib
+ 
+# CHANGE THE LINE BELOW
+path_to_ui = "block_panel.ui"
+ 
+class DimenssionBox:
+	def __init__(self, width, depth, height, foot):
+		self.width = width
+		self.depth = depth
+		self.height = height
+		self.foot = foot
+   
+
+class BlockTaskPanel:
+	def __init__(self):
+		# this will create a Qt widget from our ui file
+		dir = os.path.dirname(os.path.abspath(__file__))
+		print(dir + "/" + path_to_ui)
+		self.form = FreeCADGui.PySideUic.loadUi(dir + "/" + path_to_ui)
+		self.form.setWindowTitle("Block Panel")
+ 
+	def accept(self):
+		label = self.form.label_edit.text()
+		box = DimenssionBox(self.form.box_width.value(), self.form.box_depth.value(), self.form.box_height.value(), self.form.box_foot.value())
+		panelHeight = self.form.panel_height.value()
+		self.blockPanel(label, box, panelHeight)
+		FreeCADGui.Control.closeDialog()
+
+	def panel(self, doc, label, dimenssion, position):
+		panel = doc.newObject("Part::Box")
+		panel.Label = label
+		panel.Length = dimenssion[0]
+		panel.Width = dimenssion[1]
+		panel.Height = dimenssion[2]
+		panel.Placement = App.Placement(App.Vector(position[0],position[1],position[2]),App.Rotation(App.Vector(0.0000,0.0000,1.0000),0.0000))
+		doc.recompute()
+
+	def blockPanel(self, label, box, panel_height):
+		activeDoc = App.activeDocument();
+		obj = activeDoc.addObject('App::Part', label)
+		obj.Label = label
+		activeDoc.Tip = obj
+		self.panel(obj, "bottom panel", (box.width-(2*panel_height), box.depth, panel_height), (panel_height, 0, box.foot))
+		self.panel(obj, "top panel", (box.width-(2*panel_height), box.depth, panel_height), (panel_height, 0, box.height-panel_height))
+		self.panel(obj, "left panel", (panel_height, box.depth, box.height), (0, 0, 0))
+		self.panel(obj, "right panel", (panel_height, box.depth, box.height), (box.width-panel_height, 0, 0))
+		self.panel(obj, "back panel", (box.width-(2*panel_height), panel_height, box.height-(2*panel_height)-box.foot), (panel_height, box.depth-panel_height, box.foot+panel_height))
+		activeDoc.recompute()
+
+panel = BlockTaskPanel()
+#panel.form.show()
+FreeCADGui.Control.showDialog(panel)
