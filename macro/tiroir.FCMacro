@@ -1,0 +1,65 @@
+# -*- coding: utf-8 -*-
+
+import FreeCAD,FreeCADGui,Part,os,pathlib
+ 
+# CHANGE THE LINE BELOW
+path_to_ui = "tiroir.ui"
+ 
+class DimensionTiroir:
+	def __init__(self, inside_width, outside_width, slide_lenght, height, thickness, bottom_thickness):
+		self.width = inside_width - 12
+		self.depth = slide_lenght - 10
+		self.height = height
+		self.thickness = thickness
+		self.bottom_thickness = bottom_thickness
+		self.bottom = 30
+		self.gap = (outside_width-inside_width)/2
+   
+class DimensionFace:
+	def __init__(self, outside_width, outside_height, depth):
+		self.gap = 3		
+		self.width = outside_width - 2 * self.gap
+		self.height = outside_height - 2 * self.gap
+		self.depth = depth
+
+class TiroirTask:
+	def __init__(self):
+		# this will create a Qt widget from our ui file
+		dir = os.path.dirname(os.path.abspath(__file__))
+		print(dir + "/" + path_to_ui)
+		self.form = FreeCADGui.PySideUic.loadUi(dir + "/" + path_to_ui)
+		self.form.setWindowTitle("Tiroir")
+ 
+	def accept(self):
+		label = self.form.label_edit.text()
+		tiroir = DimensionTiroir(self.form.inside_width.value(), self.form.outside_width.value(), self.form.slide_lenght.value(), self.form.tiroir_height.value(), self.form.tiroir_thickness.value(), self.form.tiroir_bottom_thickness.value())
+		face = DimensionFace(self.form.outside_width.value(), self.form.outside_height.value(), self.form.tiroir_thickness.value())
+		self.blockTiroirPanel(label, tiroir, face)
+		FreeCADGui.Control.closeDialog()
+
+	def panel(self, doc, label, dimension, position):
+		panel = doc.newObject("Part::Box")
+		panel.Label = label
+		panel.Length = dimension[0]
+		panel.Width = dimension[1]
+		panel.Height = dimension[2]
+		panel.Placement = App.Placement(App.Vector(position[0],position[1],position[2]),App.Rotation(App.Vector(0.0000,0.0000,1.0000),0.0000))
+		doc.recompute()
+
+	def blockTiroirPanel(self, label, tiroir, face):
+		activeDoc = App.activeDocument();
+		obj = activeDoc.addObject('App::Part', label)
+		obj.Label = label
+		activeDoc.Tip = obj
+		self.panel(obj, label  + "_face", (face.width, face.depth, face.height), (face.gap, 0, face.gap))
+
+		self.panel(obj, label  + "_front", (tiroir.width - 2*tiroir.thickness, tiroir.thickness, tiroir.height - tiroir.bottom_thickness), (tiroir.gap + tiroir.thickness, face.depth, tiroir.bottom + tiroir.bottom_thickness + tiroir.gap))
+		self.panel(obj, label  + "_back", (tiroir.width - 2*tiroir.thickness, tiroir.thickness, tiroir.height - tiroir.bottom_thickness), (tiroir.gap + tiroir.thickness, face.depth + tiroir.depth - tiroir.thickness, tiroir.bottom + tiroir.bottom_thickness + tiroir.gap))
+		self.panel(obj, label  + "_left", (tiroir.thickness, tiroir.depth, tiroir.height+10), (tiroir.gap, face.depth, tiroir.bottom + tiroir.gap-10))
+		self.panel(obj, label  + "_right", (tiroir.thickness, tiroir.depth, tiroir.height+10), (tiroir.gap + tiroir.width - tiroir.thickness, face.depth, tiroir.bottom + tiroir.gap-10))
+		self.panel(obj, label  + "_bottom", (tiroir.width - 2*tiroir.thickness, tiroir.depth, tiroir.bottom_thickness), (tiroir.gap + tiroir.thickness, face.depth, tiroir.bottom + tiroir.gap))
+		activeDoc.recompute()
+
+tiroir = TiroirTask()
+#panel.form.show()
+FreeCADGui.Control.showDialog(tiroir)

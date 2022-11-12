@@ -34,7 +34,7 @@
       <item row="0" column="1">
        <widget class="QLineEdit" name="label_edit">
         <property name="text">
-         <string>tiroire_001</string>
+         <string>tiroir_001</string>
         </property>
        </widget>
       </item>
@@ -48,9 +48,9 @@
      </layout>
     </item>
     <item row="6" column="0">
-     <layout class="QFormLayout" name="panelTiroireBottomThicknessForm">
+     <layout class="QFormLayout" name="panelTiroirBottomThicknessForm">
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="tiroire_bottom_thickness">
+       <widget class="QDoubleSpinBox" name="tiroir_bottom_thickness">
         <property name="suffix">
          <string> mm</string>
         </property>
@@ -63,9 +63,9 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="tiroire_bottom_thickness_label">
+       <widget class="QLabel" name="tiroir_bottom_thickness_label">
         <property name="text">
-         <string>Epaisseur fond tiroire</string>
+         <string>Epaisseur fond tiroir</string>
         </property>
        </widget>
       </item>
@@ -164,9 +164,9 @@
      </layout>
     </item>
     <item row="5" column="0">
-     <layout class="QFormLayout" name="panelTiroireThicknessForm">
+     <layout class="QFormLayout" name="panelTiroirThicknessForm">
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="tiroire_thickness">
+       <widget class="QDoubleSpinBox" name="tiroir_thickness">
         <property name="suffix">
          <string> mm</string>
         </property>
@@ -179,18 +179,18 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="tiroire_thickness_label">
+       <widget class="QLabel" name="tiroir_thickness_label">
         <property name="text">
-         <string>Epaisseur tiroire</string>
+         <string>Epaisseur tiroir</string>
         </property>
        </widget>
       </item>
      </layout>
     </item>
     <item row="2" column="0">
-     <layout class="QFormLayout" name="panelTiroireHeightForm">
+     <layout class="QFormLayout" name="panelTiroirHeightForm">
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="tiroire_height">
+       <widget class="QDoubleSpinBox" name="tiroir_height">
         <property name="suffix">
          <string> mm</string>
         </property>
@@ -203,9 +203,9 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="tiroire_height_label">
+       <widget class="QLabel" name="tiroir_height_label">
         <property name="text">
-         <string>Hauteur Tiroire</string>
+         <string>Hauteur Tiroir</string>
         </property>
        </widget>
       </item>
