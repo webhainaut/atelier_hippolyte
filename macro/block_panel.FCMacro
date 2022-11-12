@@ -42,11 +42,11 @@ class BlockTaskPanel:
 		obj = activeDoc.addObject('App::Part', label)
 		obj.Label = label
 		activeDoc.Tip = obj
-		self.panel(obj, "bottom panel", (box.width-(2*panel_height), box.depth, panel_height), (panel_height, 0, box.foot))
-		self.panel(obj, "top panel", (box.width-(2*panel_height), box.depth, panel_height), (panel_height, 0, box.height-panel_height))
-		self.panel(obj, "left panel", (panel_height, box.depth, box.height), (0, 0, 0))
-		self.panel(obj, "right panel", (panel_height, box.depth, box.height), (box.width-panel_height, 0, 0))
-		self.panel(obj, "back panel", (box.width-(2*panel_height), panel_height, box.height-(2*panel_height)-box.foot), (panel_height, box.depth-panel_height, box.foot+panel_height))
+		self.panel(obj, label  + "_bottom", (box.width-(2*panel_height), box.depth, panel_height), (panel_height, 0, box.foot))
+		self.panel(obj, label  + "_top", (box.width-(2*panel_height), box.depth, panel_height), (panel_height, 0, box.height-panel_height))
+		self.panel(obj, label  + "_left", (panel_height, box.depth, box.height), (0, 0, 0))
+		self.panel(obj, label  + "_right", (panel_height, box.depth, box.height), (box.width-panel_height, 0, 0))
+		self.panel(obj, label  + "_back", (box.width-(2*panel_height), panel_height, box.height-(2*panel_height)-box.foot), (panel_height, box.depth-panel_height, box.foot+panel_height))
 		activeDoc.recompute()
 
 panel = BlockTaskPanel()

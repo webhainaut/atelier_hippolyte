@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BlockPanel</class>
+ <widget class="QDialog" name="BlockPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>306</width>
+    <height>325</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>325</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>291</width>
+     <height>301</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <layout class="QFormLayout" name="labelForm">
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="label_edit">
+        <property name="text">
+         <string>tiroire_001</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_label">
+        <property name="text">
+         <string>Label </string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="6" column="0">
+     <layout class="QFormLayout" name="panelTiroireBottomThicknessForm">
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="tiroire_bottom_thickness">
+        <property name="suffix">
+         <string> mm</string>
+        </property>
+        <property name="maximum">
+         <double>199.990000000000009</double>
+        </property>
+        <property name="value">
+         <double>8.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="tiroire_bottom_thickness_label">
+        <property name="text">
+         <string>Epaisseur fond tiroire</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="3" column="0">
+     <layout class="QGridLayout" name="boxLayout">
+      <item row="2" column="0">
+       <widget class="QLabel" name="box">
+        <property name="text">
+         <string>Corps du meuble</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="1">
+         <layout class="QFormLayout" name="formLayout">
+          <item row="1" column="0">
+           <widget class="QLabel" name="inside_width_label">
+            <property name="text">
+             <string>Largeur intérieur</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="inside_width">
+            <property name="suffix">
+             <string> mm</string>
+            </property>
+            <property name="maximum">
+             <double>99999.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>214.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="outside_width_label">
+            <property name="text">
+             <string>Largeur extérieur</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="outside_width">
+            <property name="suffix">
+             <string> mm</string>
+            </property>
+            <property name="maximum">
+             <double>99999.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>250.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="outside_height_label">
+            <property name="text">
+             <string>Hauteur extérieur</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="outside_height">
+            <property name="suffix">
+             <string> mm</string>
+            </property>
+            <property name="maximum">
+             <double>99999.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>300.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item row="5" column="0">
+     <layout class="QFormLayout" name="panelTiroireThicknessForm">
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="tiroire_thickness">
+        <property name="suffix">
+         <string> mm</string>
+        </property>
+        <property name="maximum">
+         <double>199.990000000000009</double>
+        </property>
+        <property name="value">
+         <double>18.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="tiroire_thickness_label">
+        <property name="text">
+         <string>Epaisseur tiroire</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="2" column="0">
+     <layout class="QFormLayout" name="panelTiroireHeightForm">
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="tiroire_height">
+        <property name="suffix">
+         <string> mm</string>
+        </property>
+        <property name="maximum">
+         <double>99999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>150.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="tiroire_height_label">
+        <property name="text">
+         <string>Hauteur Tiroire</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="4" column="0">
+     <layout class="QFormLayout" name="panelSlideLenghtForm">
+      <item row="0" column="0">
+       <widget class="QLabel" name="slide_lenght_label">
+        <property name="text">
+         <string>Longueur coullisse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="slide_lenght">
+        <property name="suffix">
+         <string> mm</string>
+        </property>
+        <property name="maximum">
+         <double>99999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>600.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
