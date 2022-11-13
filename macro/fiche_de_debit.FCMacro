@@ -1,0 +1,75 @@
+# -*- coding: utf-8 -*-
+
+import FreeCAD, FreeCADGui, Draft, Spreadsheet,os,pathlib
+
+
+class DebitCardSpreadsheet:
+	def __init__(self, activeDoc):
+		self.sheet = activeDoc.addObject('Spreadsheet::Sheet','Fiche de debit')
+		self.cl=1
+		self.buildTitle(activeDoc.Label)
+		self.buildTableHeader()
+		self.buildLineGroup("test")
+
+	def nextCl(self):
+		self.cl = self.cl + 1
+
+	def getCl(self):
+		return str(self.cl)
+
+	def buildTitle(self, title):
+		self.sheet.mergeCells('A'+self.getCl()+':H'+self.getCl())
+		self.sheet.setAlignment('A'+self.getCl()+':H'+self.getCl(), 'center', 'keep')
+		self.sheet.setStyle('A'+self.getCl()+':H'+self.getCl(), 'bold', 'add')
+		self.sheet.set('A'+self.getCl()+':H'+self.getCl(), 'FICHE DE DEBIT -  ' + title)
+		self.nextCl()
+
+	def buildTableHeader(self):
+		self.sheet.setStyle('A'+self.getCl()+':H'+self.getCl(), 'bold', 'add')
+		self.sheet.setForeground('A'+self.getCl()+':H'+self.getCl(), (1,1,1))
+		self.sheet.setBackground('A'+self.getCl()+':H'+self.getCl(), (0,0.45,0))
+
+		self.sheet.set('A'+self.getCl(), 'N°')
+		self.sheet.set('B'+self.getCl(), 'Désignation')
+		self.sheet.set('C'+self.getCl(), 'Qté')
+		self.sheet.set('D'+self.getCl(), 'Long.')
+		self.sheet.set('E'+self.getCl(), 'Larg.')
+		self.sheet.set('F'+self.getCl(), 'Ep.')
+		self.sheet.set('G'+self.getCl(), 'Matière')
+		self.sheet.set('H'+self.getCl(), 'Dimension debit')
+		self.nextCl()
+
+	def buildLineGroup(self, title):
+		self.sheet.mergeCells('A'+self.getCl()+':H'+self.getCl())
+		self.sheet.setAlignment('A'+self.getCl()+':H'+self.getCl(), 'center', 'keep')
+		self.sheet.setStyle('A'+self.getCl()+':H'+self.getCl(), 'bold', 'add')
+		self.sheet.set('A'+self.getCl()+':H'+self.getCl(), title)
+		self.nextCl()
+
+
+#App.activeDocument().addObject('Spreadsheet::Sheet','Fiche de debit')
+# App.ActiveDocument.Label - nom du doc
+# App.ActiveDocument.Spreadsheet.mergeCells('A1:H1') - fusion des cellules
+# App.ActiveDocument.Spreadsheet.setAlignment('A1:H1', 'center', 'keep')
+# App.ActiveDocument.Spreadsheet.setStyle('A1:H1', 'bold', 'add')
+
+# Fond vert écrit en blanc
+# App.ActiveDocument.Spreadsheet.setBackground('A2:H2', (0,0.45,0))
+# App.ActiveDocument.Spreadsheet.setForeground('A2:H2', (1,1,1))
+# App.ActiveDocument.Spreadsheet.setStyle('A2:H2', 'bold', 'add')
+
+# sous titre
+# App.ActiveDocument.Spreadsheet.mergeCells('A3:H3') - fusion des cellules
+# App.ActiveDocument.Spreadsheet.setAlignment('A3:H3', 'center', 'keep')
+# App.ActiveDocument.Spreadsheet.setStyle('A3:H3', 'bold', 'add')
+#.set("A1", ...)
+objs = App.ActiveDocument.Objects
+
+for obj in objs:
+	if obj.isDerivedFrom("App::Part"):
+		print(obj.Label)
+	if obj.isDerivedFrom("Part::Box"):
+		print(obj.Label)
+
+sheet = DebitCardSpreadsheet(App.ActiveDocument)
+App.ActiveDocument.recompute()
