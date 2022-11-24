@@ -135,7 +135,7 @@ class DebitCardSpreadsheet:
 		self.nextCl()
 
 	def buildLine(self, line):
-
+		self.sheet.setRowHeight(self.getCl(),  line.qt * 22)
 		self.sheet.set('A'+self.getCl(), line.index)
 		self.sheet.set('B'+self.getCl(), line.label)
 		self.sheet.set('C'+self.getCl(), str(line.qt))
@@ -173,7 +173,12 @@ class DebitCard:
 				for obj in part.Group:
 					if obj.isDerivedFrom("Part::Box"):
 						line = DebitCardLine(obj.Label, obj.Length, obj.Width, obj.Height, "/")
-						lines.append(line)	
+						if line in lines:
+							lineQtUp = lines[lines.index(line)]
+							lineQtUp.qt = lineQtUp.qt + 1
+							lineQtUp.label = lineQtUp.label + "\n" + line.label
+						else:
+							lines.append(line)	
 				self.groups.append(DebitCardGroup(obj.Label, lines))
 
 	def build(self):
