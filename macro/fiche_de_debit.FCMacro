@@ -2,6 +2,44 @@
 
 import FreeCAD, FreeCADGui, Draft, Spreadsheet,os,pathlib
 
+class DebitCardGroup:
+
+	group = None
+	indexGroup = 'A'
+
+	def __init__(self, group, material, lines):
+		if(DebitCardGroup.group == None):
+			DebitCardGroup.group = group
+		elif(DebitCardGroup.group!=group):
+			DebitCardGroup.group = group
+			DebitCardGroup.indexGroup = self.nextIndexGroup()
+		self.group = group
+		self.lines = []
+		for line in lines:
+			self.lines.append(DebitCardLine(self.indexGroup+str(len(self.lines) + 1), material))
+			
+	def nextIndexGroup(self):
+		return chr((ord(DebitCardGroup.indexGroup.upper())+1 - 65) % 26 + 65)
+
+class DebitCardLine:
+	
+	def __init__(self, index, material):
+		self.index = index
+		self.label = index + " - label"
+		self.qt = 2
+		self.length = 4
+		self.width = 5
+		self.thickness = 18
+		self.material = material
+
+	def getLengthDebit(self):
+		return self.length + 5
+
+	def getWidthDebit(self):
+		return self.width + 5
+
+	def getThicknessDebit(self):
+		return self.thickness + 5
 
 class DebitCardSpreadsheet:
 	def __init__(self, activeDoc):
@@ -9,7 +47,12 @@ class DebitCardSpreadsheet:
 		self.cl=1
 		self.buildTitle(activeDoc.Label)
 		self.buildTableHeader()
-		self.buildLineGroup("test")
+
+	def buildTable(self, group):
+		for group in groups:
+			self.buildLineGroup(group.group)
+			for line in group.lines:
+				self.buildLine(line)
 
 	def nextCl(self):
 		self.cl = self.cl + 1
@@ -46,6 +89,18 @@ class DebitCardSpreadsheet:
 		self.sheet.set('A'+self.getCl()+':H'+self.getCl(), title)
 		self.nextCl()
 
+	def buildLine(self, line):
+
+		self.sheet.set('A'+self.getCl(), line.index)
+		self.sheet.set('B'+self.getCl(), line.label)
+		self.sheet.set('C'+self.getCl(), str(line.qt))
+		self.sheet.set('D'+self.getCl(), str(line.length))
+		self.sheet.set('E'+self.getCl(), str(line.width))
+		self.sheet.set('F'+self.getCl(), str(line.thickness))
+		self.sheet.set('G'+self.getCl(), line.material)
+		self.sheet.set('H'+self.getCl(), str(line.qt) + "x " + str(line.getLengthDebit()) + "x" + str(line.getWidthDebit()) + "x" + str(line.getThicknessDebit()))
+		self.nextCl()
+
 
 #App.activeDocument().addObject('Spreadsheet::Sheet','Fiche de debit')
 # App.ActiveDocument.Label - nom du doc
@@ -63,13 +118,19 @@ class DebitCardSpreadsheet:
 # App.ActiveDocument.Spreadsheet.setAlignment('A3:H3', 'center', 'keep')
 # App.ActiveDocument.Spreadsheet.setStyle('A3:H3', 'bold', 'add')
 #.set("A1", ...)
-objs = App.ActiveDocument.Objects
 
-for obj in objs:
-	if obj.isDerivedFrom("App::Part"):
-		print(obj.Label)
-	if obj.isDerivedFrom("Part::Box"):
-		print(obj.Label)
+# objs = App.ActiveDocument.Objects
+# for obj in objs:
+	# if obj.isDerivedFrom("App::Part"):
+		# print("part " + obj.Label)
+	# if obj.isDerivedFrom("Part::Box"):
+		# print("box " +obj.Label)
+	# if obj.isDerivedFrom("PartDesign::Pad"):
+		# print("Pad " +obj.Label)
 
 sheet = DebitCardSpreadsheet(App.ActiveDocument)
+groups = []
+groups.append(DebitCardGroup("test", "-", [1,2]))
+groups.append(DebitCardGroup("test2", "-", [1]))
+sheet.buildTable(groups)
 App.ActiveDocument.recompute()
