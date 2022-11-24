@@ -1,58 +1,103 @@
 # -*- coding: utf-8 -*-
 
 import FreeCAD, FreeCADGui, Draft, Spreadsheet,os,pathlib
+NUMER_FORMAT = "{:.2f}"
+
+class Line:
+	def __init__(self):
+		self.qt = 1
 
 class DebitCardGroup:
 
-	group = None
-	indexGroup = 'A'
+	indexGroup = 'z'
 
-	def __init__(self, group, material, lines):
-		if(DebitCardGroup.group == None):
-			DebitCardGroup.group = group
-		elif(DebitCardGroup.group!=group):
-			DebitCardGroup.group = group
-			DebitCardGroup.indexGroup = self.nextIndexGroup()
-		self.group = group
+	def __init__(self, group, lines):
+		DebitCardGroup.indexGroup = self.nextIndexGroup()
+		self.label = group
 		self.lines = []
+		self.surfaces = {}
+		self.volum = 0
 		for line in lines:
-			self.lines.append(DebitCardLine(self.indexGroup+str(len(self.lines) + 1), material))
+			line.index = self.indexGroup+str(len(self.lines) + 1)
+			if line.getThickness() in self.surfaces.keys():				
+				self.surfaces[line.getThickness()] = self.surfaces[line.getThickness()]+ line.getSurface()
+			else:
+				self.surfaces[line.thickness.Value] = line.getSurface()
+			self.volum = self.volum + line.getVolum()
+			self.lines.append(line)
 			
 	def nextIndexGroup(self):
 		return chr((ord(DebitCardGroup.indexGroup.upper())+1 - 65) % 26 + 65)
 
 class DebitCardLine:
 	
-	def __init__(self, index, material):
-		self.index = index
-		self.label = index + " - label"
-		self.qt = 2
-		self.length = 4
-		self.width = 5
-		self.thickness = 18
+	def __init__(self, label, partLenght, partWidth, partHeight, material):
+		self.index = 1
+		self.label = label
+		self.qt = 1
+		dimension = [partLenght, partWidth, partHeight]
+		dimension.sort()
+		self.length = dimension[1]
+		self.width = dimension[2]
+		self.thickness = dimension[0]
 		self.material = material
 
 	def getLengthDebit(self):
-		return self.length + 5
+		return self.length.Value + 5
 
 	def getWidthDebit(self):
-		return self.width + 5
+		return self.width.Value + 5
 
 	def getThicknessDebit(self):
-		return self.thickness + 5
+		return self.thickness.Value + 5
+
+	def getDebit(self):
+		return '{:d} - {:.{w}f}x{:.{w}f}x{:.{w}f} {unit}³'.format(self.qt, self.getLengthDebit(), self.getWidthDebit(), self.getThicknessDebit(), w=0, unit = Units.Metre.getUserPreferred()[2])
+
+	def getSurface(self, unit = "m^2"):
+		surface = self.length * self.width
+		return  surface.getValueAs(unit)
+
+	def getVolum(self, unit = "m^3"):
+		volum = self.length * self.width * self.thickness
+		return  volum.getValueAs(unit)
+
+	def getLength(self):
+		return str(self.length) 
+
+	def getWidth(self):
+		return str(self.width)
+
+	def getThickness(self):
+		return str(self.thickness)
+	
+	def __eq__(self, other):
+		return self.length == other.length and self.width == other.width and self.thickness == other.thickness and self.material == other.material
+
+		
 
 class DebitCardSpreadsheet:
 	def __init__(self, activeDoc):
 		self.sheet = activeDoc.addObject('Spreadsheet::Sheet','Fiche de debit')
 		self.cl=1
-		self.buildTitle(activeDoc.Label)
+		self.buildTitle('FICHE DE DEBIT -  ' +activeDoc.Label)
 		self.buildTableHeader()
 
-	def buildTable(self, group):
+	def buildTable(self, groups):
+		surfacesTot = {}
+		volumTot = 0
 		for group in groups:
-			self.buildLineGroup(group.group)
+			self.buildTitle(group.label)
 			for line in group.lines:
 				self.buildLine(line)
+			self.buildFooterCalculateLines(group.surfaces, group.volum)
+			for surface in group.surfaces:
+				if surface in surfacesTot.keys():				
+					surfacesTot[surface] = surfacesTot[surface]+ group.surfaces[surface]
+				else:
+					surfacesTot[surface] = group.surfaces[surface]
+			volumTot = volumTot + group.volum
+		self.buildFooter(surfacesTot, volumTot)
 
 	def nextCl(self):
 		self.cl = self.cl + 1
@@ -64,7 +109,7 @@ class DebitCardSpreadsheet:
 		self.sheet.mergeCells('A'+self.getCl()+':H'+self.getCl())
 		self.sheet.setAlignment('A'+self.getCl()+':H'+self.getCl(), 'center', 'keep')
 		self.sheet.setStyle('A'+self.getCl()+':H'+self.getCl(), 'bold', 'add')
-		self.sheet.set('A'+self.getCl()+':H'+self.getCl(), 'FICHE DE DEBIT -  ' + title)
+		self.sheet.set('A'+self.getCl()+':H'+self.getCl(), title)
 		self.nextCl()
 
 	def buildTableHeader(self):
@@ -73,20 +118,20 @@ class DebitCardSpreadsheet:
 		self.sheet.setBackground('A'+self.getCl()+':H'+self.getCl(), (0,0.45,0))
 
 		self.sheet.set('A'+self.getCl(), 'N°')
+		self.sheet.setColumnWidth('A', 40)
 		self.sheet.set('B'+self.getCl(), 'Désignation')
+		self.sheet.setColumnWidth('B', 150)
 		self.sheet.set('C'+self.getCl(), 'Qté')
+		self.sheet.setColumnWidth('C', 60)
 		self.sheet.set('D'+self.getCl(), 'Long.')
+		self.sheet.setColumnWidth('D', 110)
 		self.sheet.set('E'+self.getCl(), 'Larg.')
+		self.sheet.setColumnWidth('E', 110)
 		self.sheet.set('F'+self.getCl(), 'Ep.')
+		self.sheet.setColumnWidth('F', 110)
 		self.sheet.set('G'+self.getCl(), 'Matière')
 		self.sheet.set('H'+self.getCl(), 'Dimension debit')
-		self.nextCl()
-
-	def buildLineGroup(self, title):
-		self.sheet.mergeCells('A'+self.getCl()+':H'+self.getCl())
-		self.sheet.setAlignment('A'+self.getCl()+':H'+self.getCl(), 'center', 'keep')
-		self.sheet.setStyle('A'+self.getCl()+':H'+self.getCl(), 'bold', 'add')
-		self.sheet.set('A'+self.getCl()+':H'+self.getCl(), title)
+		self.sheet.setColumnWidth('H', 150)
 		self.nextCl()
 
 	def buildLine(self, line):
@@ -94,43 +139,50 @@ class DebitCardSpreadsheet:
 		self.sheet.set('A'+self.getCl(), line.index)
 		self.sheet.set('B'+self.getCl(), line.label)
 		self.sheet.set('C'+self.getCl(), str(line.qt))
-		self.sheet.set('D'+self.getCl(), str(line.length))
-		self.sheet.set('E'+self.getCl(), str(line.width))
-		self.sheet.set('F'+self.getCl(), str(line.thickness))
+		self.sheet.set('D'+self.getCl(), line.getLength())
+		self.sheet.set('E'+self.getCl(), line.getWidth())
+		self.sheet.set('F'+self.getCl(), line.getThickness())
 		self.sheet.set('G'+self.getCl(), line.material)
-		self.sheet.set('H'+self.getCl(), str(line.qt) + "x " + str(line.getLengthDebit()) + "x" + str(line.getWidthDebit()) + "x" + str(line.getThicknessDebit()))
+		self.sheet.set('H'+self.getCl(), line.getDebit())
+
 		self.nextCl()
+	
+	def buildFooterCalculateLines(self, surfaces, volum):
+		self.sheet.set('G'+self.getCl(), "Volume")
+		self.sheet.set('H'+self.getCl(), '{:.3f} m³'.format(volum.Value))
+		for i in surfaces:
+			self.sheet.setStyle('A'+self.getCl()+':H'+self.getCl(), 'bold', 'add')
+			self.sheet.mergeCells('C'+self.getCl()+':D'+self.getCl())
+			self.sheet.set('C'+self.getCl()+':D'+self.getCl(), 'Surface (ep. {:g})'.format(i))
+			self.sheet.set('E'+self.getCl(), '{:.3f} m²'.format(surfaces[i].Value))
+			self.nextCl()
+
+	def buildFooter(self, surfaces, volum):
+		self.buildTitle("TOTAUX")
+		self.buildFooterCalculateLines(surfaces, volum)
+
+class DebitCard:
+	
+	def __init__(self, activeDoc):
+		self.activeDoc = activeDoc
+		self.groups = []
+		objs = activeDoc.Objects
+		for part in objs:
+			if part.isDerivedFrom("App::Part"):
+				lines = []
+				for obj in part.Group:
+					if obj.isDerivedFrom("Part::Box"):
+						line = DebitCardLine(obj.Label, obj.Length, obj.Width, obj.Height, "/")
+						lines.append(line)	
+				self.groups.append(DebitCardGroup(obj.Label, lines))
+
+	def build(self):
+		FreeCAD.Console.PrintMessage("Ne pas oublier de changer la précision dans les préférences!\n")
+		sheet = DebitCardSpreadsheet(activeDoc)
+		sheet.buildTable(self.groups)
+		activeDoc.recompute()
 
 
-#App.activeDocument().addObject('Spreadsheet::Sheet','Fiche de debit')
-# App.ActiveDocument.Label - nom du doc
-# App.ActiveDocument.Spreadsheet.mergeCells('A1:H1') - fusion des cellules
-# App.ActiveDocument.Spreadsheet.setAlignment('A1:H1', 'center', 'keep')
-# App.ActiveDocument.Spreadsheet.setStyle('A1:H1', 'bold', 'add')
-
-# Fond vert écrit en blanc
-# App.ActiveDocument.Spreadsheet.setBackground('A2:H2', (0,0.45,0))
-# App.ActiveDocument.Spreadsheet.setForeground('A2:H2', (1,1,1))
-# App.ActiveDocument.Spreadsheet.setStyle('A2:H2', 'bold', 'add')
-
-# sous titre
-# App.ActiveDocument.Spreadsheet.mergeCells('A3:H3') - fusion des cellules
-# App.ActiveDocument.Spreadsheet.setAlignment('A3:H3', 'center', 'keep')
-# App.ActiveDocument.Spreadsheet.setStyle('A3:H3', 'bold', 'add')
-#.set("A1", ...)
-
-# objs = App.ActiveDocument.Objects
-# for obj in objs:
-	# if obj.isDerivedFrom("App::Part"):
-		# print("part " + obj.Label)
-	# if obj.isDerivedFrom("Part::Box"):
-		# print("box " +obj.Label)
-	# if obj.isDerivedFrom("PartDesign::Pad"):
-		# print("Pad " +obj.Label)
-
-sheet = DebitCardSpreadsheet(App.ActiveDocument)
-groups = []
-groups.append(DebitCardGroup("test", "-", [1,2]))
-groups.append(DebitCardGroup("test2", "-", [1]))
-sheet.buildTable(groups)
-App.ActiveDocument.recompute()
+activeDoc = App.ActiveDocument
+debitCard = DebitCard(activeDoc)
+debitCard.build()
